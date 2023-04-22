@@ -8,7 +8,7 @@
     <TextView
         android:padding="5dp"
         android:id="@+id/tvPackageName"
-        android:textSize="20sp"
+        android:textSize="13sp"
         android:textColor="@color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

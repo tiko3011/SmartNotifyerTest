@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListAdapter extends ArrayAdapter<String> {
+public class ListAdapter extends ArrayAdapter<String>  {
 
     private ArrayList<String> name;
     private ArrayList<Long> time;
@@ -44,6 +44,12 @@ public class ListAdapter extends ArrayAdapter<String> {
         textView1.setText(name.get(position));
         textView2.setText(String.valueOf(time.get(position)));
         return rowView;
+    }
+
+    @Override
+    public void notifyDataSetChanged(){
+
+
     }
 
 }
