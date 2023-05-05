@@ -22,6 +22,25 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    String[] arr = new String[]{
+            "youtube",
+            "viber",
+            "beeline",
+            "instagram",
+            "gallery3d",
+            "ecommerence",
+            "music",
+            "smartnotifyer",
+            "launcher",
+            "sbrowser",
+            "forest",
+            "popupcalculator",
+            "settings",
+            "snapchat",
+            "telegram"
+    };
+
+
     private TextView usageStatsTextView;
 
     RecyclerView statRecycler;
@@ -47,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < usageStatsList.size(); i++) {
                 UsageStats usageStats = usageStatsList.get(i);
                 if (usageStats.getTotalTimeInForeground() / 60000 > 0) {
-                    stats.add(new Stat(i, usageStats.getPackageName(), String.valueOf(usageStats.getTotalTimeInForeground() / 60000)));
+                    stats.add(new Stat(i, changePackageName(usageStats.getPackageName()) , String.valueOf(usageStats.getTotalTimeInForeground() / 60000)));
+                    Log.i("statInfo", usageStats.getPackageName());
                 }
             }
 
@@ -69,4 +89,36 @@ public class MainActivity extends AppCompatActivity {
         statAdapter = new StatAdapter(this, statList);
         statRecycler.setAdapter(statAdapter);
     }
+
+    public String changePackageName(String str){
+
+        str += ".";
+        List<String> substrings = new ArrayList<>();
+
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '.') {
+                for (int j = i + 1; j < str.length(); j++) {
+                    if (str.charAt(j) == '.') {
+                        String substring = str.substring(i + 1, j);
+                        substrings.add(substring);
+                        i = j - 1; // Skip to the next dot
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < substrings.size(); i++) {
+            for (int j = 0; j < arr.length; j++) {
+
+                if (substrings.get(i).equals(arr[j])){
+                    return arr[j];
+                }
+
+            }
+        }
+
+        return str;
+    }
+
 }
