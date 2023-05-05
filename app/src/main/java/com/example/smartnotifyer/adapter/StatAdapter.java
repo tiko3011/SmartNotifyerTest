@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ public class StatAdapter extends RecyclerView.Adapter<StatAdapter.StatViewHolder
     public void onBindViewHolder(@NonNull StatViewHolder holder, int position) {
         holder.packageName.setText(stats.get(position).getPackageName());
         holder.timeUsed.setText(stats.get(position).getTimeUsed());
+        holder.statIcon.setImageDrawable(stats.get(position).getPackageIcon());
     }
 
 
@@ -49,12 +51,14 @@ public class StatAdapter extends RecyclerView.Adapter<StatAdapter.StatViewHolder
 
         TextView packageName;
         TextView timeUsed;
+        ImageView statIcon;
 
         public StatViewHolder(@NonNull View itemView) {
             super(itemView);
 
             packageName = itemView.findViewById(R.id.item_tv_UsageStat_name);
             timeUsed = itemView.findViewById(R.id.item_tv_UsageStat_time);
+            statIcon = itemView.findViewById(R.id.item_iv_UsageStat_icon);
         }
     }
 }

@@ -8,8 +8,15 @@ import android.app.LauncherActivity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,31 +29,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    String[] arr = new String[]{
-            "youtube",
-            "viber",
-            "beeline",
-            "instagram",
-            "gallery3d",
-            "ecommerence",
-            "music",
-            "smartnotifyer",
-            "launcher",
-            "sbrowser",
-            "forest",
-            "popupcalculator",
-            "settings",
-            "snapchat",
-            "telegram"
-    };
-
-
-    private TextView usageStatsTextView;
+    String[] arrNames = {"youtube", "viber", "beeline", "instagram", "gallery3d", "ecommerence", "music", "smartnotifyer", "launcher", "sbrowser", "forest", "popupcalculator", "settings", "snapchat", "telegram"};
+    String[] arrNamesChanged = {"Youtube", "Viber", "My Team", "Instagram", "Gallery", "E Commerence", "Music", "Smart Notifyer", "One UI Home", "Samsung Browser", "Forest", "Calculator", "Settings", "Snapchat", "Telegram"};
 
     RecyclerView statRecycler;
     StatAdapter statAdapter;
 
-    // Current time and interval
     long endTime = System.currentTimeMillis();
     long startTime = endTime - 14*60000*60;
     @Override
@@ -54,27 +42,57 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        List<Stat> stats = new ArrayList<>();
-
-        // App usage stats list
         UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
         List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime);
 
-        // Put List in TextView
+        List<Stat> stats = new ArrayList<>();
+
         if (usageStatsList != null && usageStatsList.size() > 0) {
-            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < usageStatsList.size(); i++) {
                 UsageStats usageStats = usageStatsList.get(i);
+
                 if (usageStats.getTotalTimeInForeground() / 60000 > 0) {
-                    stats.add(new Stat(i, changePackageName(usageStats.getPackageName()) , String.valueOf(usageStats.getTotalTimeInForeground() / 60000)));
-                    Log.i("statInfo", usageStats.getPackageName());
+                    String packageName = usageStats.getPackageName();
+                    PackageManager packageManager = getPackageManager();
+                    String appName = null;
+                    Drawable icon = null;
+
+                    try {
+                        ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
+
+                        appName = packageManager.getApplicationLabel(appInfo).toString();
+                        String totalTimeUsed = convertHour(usageStats.getTotalTimeInForeground());
+                        icon = getPackageManager().getApplicationIcon(usageStats.getPackageName());
+
+                        stats.add(new Stat(i, appName , totalTimeUsed, icon));
+                        Log.i("statInfo", usageStats.getPackageName());
+                    }
+                    catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+
+                        appName = changePackageName(packageName);
+                        String totalTimeUsed = convertHour(usageStats.getTotalTimeInForeground());
+                        icon = getResources().getDrawable(R.mipmap.ic_launcher);
+
+                        stats.add(new Stat(i, appName, totalTimeUsed, icon));
+                        Log.i("statInfo", usageStats.getPackageName());
+                    }
                 }
             }
 
         } else {
-
+            statRecycler.setVisibility(View.GONE);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         setStatRecycler(stats);
     }
@@ -109,10 +127,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         for (int i = 0; i < substrings.size(); i++) {
-            for (int j = 0; j < arr.length; j++) {
+            for (int j = 0; j < arrNames.length; j++) {
 
-                if (substrings.get(i).equals(arr[j])){
-                    return arr[j];
+                if (substrings.get(i).equals(arrNames[j])){
+                    return arrNamesChanged[j];
                 }
 
             }
@@ -121,4 +139,13 @@ public class MainActivity extends AppCompatActivity {
         return str;
     }
 
+    public String convertHour(long milliseconds){
+        long minute = milliseconds / 60000;
+
+        if (minute > 60){
+            return String.valueOf(minute / 60) + " h " + String.valueOf(minute % 60) + " m";
+        } else {
+            return String.valueOf(minute + " m");
+        }
+    }
 }
