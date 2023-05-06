@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.LauncherActivity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -18,12 +19,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.SeekBar;
 
 import com.example.smartnotifyer.adapter.StatAdapter;
 import com.example.smartnotifyer.model.Stat;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,12 +38,61 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView statRecycler;
     StatAdapter statAdapter;
 
-    long endTime = System.currentTimeMillis();
-    long startTime = endTime - 14*60000*60;
+
+    int hour = 12;
+    int minute = 0;
+
+    SeekBar barSetInterval;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        barSetInterval = findViewById(R.id.bar_set_interval);
+        barSetInterval.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // Called when the progress value changes
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Called when the user starts interacting with the SeekBar
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Called when the user stops interacting with the SeekBar
+                Thread getTime = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LocalTime currentTime = LocalTime.now();
+
+                        int hourThread = currentTime.getHour();
+                        int minuteThread = currentTime.getMinute();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Run in MainThread
+
+                                hour = hourThread;
+                                minute = minuteThread;
+
+                                Log.i("currentTime", "SeekBar: " +String.valueOf(hour) + ":" + String.valueOf(minute));
+                            }
+                        });
+                    }
+                });
+                getTime.start();
+            }
+        });
+
+        long endTime = System.currentTimeMillis();
+        long startTime = endTime - (long) hour * 60000 * 60 + (long) minute * 60000;
+
+        Log.i("currentTime", String.valueOf(hour) + ":" + String.valueOf(minute));
+
 
         UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
         List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime);
@@ -148,4 +200,5 @@ public class MainActivity extends AppCompatActivity {
             return String.valueOf(minute + " m");
         }
     }
+
 }
