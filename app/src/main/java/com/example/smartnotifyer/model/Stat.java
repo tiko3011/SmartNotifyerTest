@@ -2,15 +2,17 @@ package com.example.smartnotifyer.model;
 
 import android.graphics.drawable.Drawable;
 
-public class Stat {
+import com.example.smartnotifyer.MainActivity;
+import com.example.smartnotifyer.tools.ConvertStats;
+
+public class Stat implements Comparable<Stat>{
 
     int id;
     String packageName;
     String timeUsed;
     Drawable packageIcon;
 
-    public Stat(int id, String packageName, String timeUsed, Drawable packageIcon) {
-        this.id = id;
+    public Stat(String packageName, String timeUsed, Drawable packageIcon) {
         this.packageName = packageName;
         this.timeUsed = timeUsed;
         this.packageIcon = packageIcon;
@@ -46,5 +48,11 @@ public class Stat {
 
     public void setPackageIcon(Drawable packageIcon) {
         this.packageIcon = packageIcon;
+    }
+
+    @Override
+    public int compareTo(Stat o) {
+        ConvertStats tool = new ConvertStats();
+        return Long.compare(tool.convertStringToHour(o.timeUsed) , tool.convertStringToHour(this.timeUsed)) ;
     }
 }
