@@ -15,8 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.smartnotifyer.adapter.StatAdapter;
+import com.example.smartnotifyer.alarm.AlarmHelper;
 import com.example.smartnotifyer.model.Stat;
 import com.example.smartnotifyer.tools.ConvertStats;
 
@@ -33,19 +35,24 @@ public class MainActivity extends AppCompatActivity {
 
     List<Stat> stats = new ArrayList<>();
 
-    ConvertStats tool = new ConvertStats();
+    private AlarmHelper alarmHelper;
+
+    Context context;
+    ConvertStats tool;
+
     TextView tvInterval;
     SeekBar barSetInterval;
     int hour = 12;
     int minute = 0;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        context = getApplicationContext();
+        tool = new ConvertStats(context);
+
         tvInterval = findViewById(R.id.tv_interval);
         barSetInterval = findViewById(R.id.bar_set_interval);
         barSetInterval.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -62,12 +69,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 // Called when the user stops interacting with the SeekBar
-
-                LocalTime currentTime = LocalTime.now();
-                hour = currentTime.getHour();
-                minute = currentTime.getMinute();
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
                 hour = (barSetInterval.getProgress() == 0) ? 1 : barSetInterval.getProgress();
 
                 long endTimeUpdate = System.currentTimeMillis();
@@ -77,8 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 List<UsageStats> usageStatsListUpdate = usageStatsManagerUpdate.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTimeUpdate, endTimeUpdate);
                 stats.clear();
 
-                setStats(usageStatsListUpdate, stats, startTimeUpdate);
-                tool.checkDuplicates(stats);
+                tool.setStats(usageStatsListUpdate, stats, startTimeUpdate);
                 statAdapter.notifyDataSetChanged();
             }
         });
@@ -89,14 +89,19 @@ public class MainActivity extends AppCompatActivity {
         UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
         List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime);
 
-        setStats(usageStatsList, stats, startTime);
-        tool.checkDuplicates(stats);
+        tool.setStats(usageStatsList, stats, startTime);
         setStatRecycler(stats);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //Set alarm, close app and expect wake up in 1 minute
+        alarmHelper = new AlarmHelper();
+        alarmHelper.setAlarmInNextMinute(this);
+        Toast.makeText(this, "Wake Up In Background", Toast.LENGTH_SHORT).show();
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     private void setStatRecycler(List<Stat> statList) {
-
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
 
         statRecycler = findViewById(R.id.rv_usage_stats);
@@ -106,46 +111,5 @@ public class MainActivity extends AppCompatActivity {
         statRecycler.setAdapter(statAdapter);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @SuppressLint("UseCompatLoadingForDrawables")
-    public void setStats(List<UsageStats> usageStatsList, List<Stat> myStat, long startTimeUpdate){
-
-        if (usageStatsList != null && usageStatsList.size() > 0) {
-            for (int i = 0; i < usageStatsList.size(); i++) {
-                UsageStats usageStats = usageStatsList.get(i);
-
-                if (usageStats.getTotalTimeInForeground() / 60000 > 0 && usageStats.getLastTimeUsed() >= startTimeUpdate) {
-                    String packageName = usageStats.getPackageName();
-                    PackageManager packageManager = getPackageManager();
-                    String appName = null;
-                    Drawable icon = null;
-
-                    try {
-                        ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
-
-                        appName = packageManager.getApplicationLabel(appInfo).toString();
-                        String totalTimeUsed = tool.convertMiliToString(usageStats.getTotalTimeInForeground());
-                        icon = getPackageManager().getApplicationIcon(usageStats.getPackageName());
-
-                        myStat.add(new Stat(appName , totalTimeUsed, icon));
-                        Log.i("statInfo", usageStats.getPackageName());
-                    }
-                    catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-
-                        appName = tool.changePackageName(packageName);
-                        String totalTimeUsed = tool.convertMiliToString(usageStats.getTotalTimeInForeground());
-                        icon = getResources().getDrawable(R.mipmap.ic_launcher);
-
-                        myStat.add(new Stat(appName, totalTimeUsed, icon));
-                        tool.checkDuplicates(stats);
-                        Collections.sort(stats);
-                    }
-                }
-            }
-
-        }
-
-    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

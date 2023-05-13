@@ -55,4 +55,12 @@ public class Stat implements Comparable<Stat>{
         ConvertStats tool = new ConvertStats();
         return Long.compare(tool.convertStringToHour(o.timeUsed) , tool.convertStringToHour(this.timeUsed)) ;
     }
+
+    @Override
+    public String toString() {
+        return "Stat{" +
+                "packageName='" + packageName + '\'' +
+                ", timeUsed='" + timeUsed + '\'' +
+                '}';
+    }
 }

@@ -1,16 +1,33 @@
 package com.example.smartnotifyer.tools;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
+import android.app.usage.UsageStats;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import com.example.smartnotifyer.R;
 import com.example.smartnotifyer.model.Stat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ConvertStats {
+    String[] arrNames = {"youtube", "viber", "beeline", "instagram", "gallery3d", "ecommerence", "music", "smartnotifyer", "launcher", "sbrowser", "forest", "popupcalculator", "settings", "snapchat", "telegram", "pinterest", "musically", "maps", "bazarblot", "roommvvm", "alarmik"};
+    String[] arrNamesChanged = {"Youtube", "Viber", "My Team", "Instagram", "Gallery", "E Commerence", "Music", "Smart Notifyer", "One UI Home", "Samsung Browser", "Forest", "Calculator", "Settings", "Snapchat", "Telegram", "Pinterest", "TikTok", "Map", "Blot",  "MVVM Example", "Alarmik"};
 
-    String[] arrNames = {"youtube", "viber", "beeline", "instagram", "gallery3d", "ecommerence", "music", "smartnotifyer", "launcher", "sbrowser", "forest", "popupcalculator", "settings", "snapchat", "telegram", "pinterest", "musically", "maps", "bazarblot", "roommvvm"};
-    String[] arrNamesChanged = {"Youtube", "Viber", "My Team", "Instagram", "Gallery", "E Commerence", "Music", "Smart Notifyer", "One UI Home", "Samsung Browser", "Forest", "Calculator", "Settings", "Snapchat", "Telegram", "Pinterest", "TikTok", "Map", "Blot",  "MVVM Example"};
+    Context context;
+    public ConvertStats(Context context){
+        this.context = context;
+    }
+
+    public ConvertStats(){
+        // Empty Constructor
+    }
 
     public void checkDuplicates(List<Stat> stats){
         for (int i = 0; i < stats.size(); i++) {
@@ -21,9 +38,6 @@ public class ConvertStats {
 
                 if (packageNameI.equals(packageNameJ)){
                     String totalTime = convertMinuteToString(((Long) convertStringToHour(stats.get(j).getTimeUsed()))  + (Long) convertStringToHour(stats.get(i).getTimeUsed()));
-                    Log.i("TopBoy", totalTime);
-
-
                     stats.get(i).setTimeUsed(totalTime);
                     stats.remove(stats.get(j));
                     break;
@@ -92,6 +106,51 @@ public class ConvertStats {
             String minutesString = timeString.split(" ")[0];
             return Long.parseLong(minutesString);
         }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    public void setStats(List<UsageStats> usageStatsList, List<Stat> myStat, long startTimeUpdate){
+
+        if (usageStatsList != null && usageStatsList.size() > 0) {
+            for (int i = 0; i < usageStatsList.size(); i++) {
+                UsageStats usageStats = usageStatsList.get(i);
+
+                if (usageStats.getTotalTimeInForeground() / 60000 > 0 && usageStats.getLastTimeUsed() >= startTimeUpdate) {
+                    String packageName = usageStats.getPackageName();
+                    PackageManager packageManager = context.getPackageManager();
+                    String appName = null;
+                    Drawable icon = null;
+
+                    try {
+                        ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
+
+                        appName = packageManager.getApplicationLabel(appInfo).toString();
+                        String totalTimeUsed = convertMiliToString(usageStats.getTotalTimeInForeground());
+                        icon = context.getPackageManager().getApplicationIcon(usageStats.getPackageName());
+
+                        myStat.add(new Stat(appName , totalTimeUsed, icon));
+                        Log.i("statInfo", usageStats.getPackageName());
+                    }
+                    catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+
+                        appName = changePackageName(packageName);
+                        String totalTimeUsed = convertMiliToString(usageStats.getTotalTimeInForeground());
+                        icon = context.getResources().getDrawable(R.mipmap.ic_launcher);
+
+                        myStat.add(new Stat(appName, totalTimeUsed, icon));
+                        checkDuplicates(myStat);
+                        Collections.sort(myStat);
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    public void someTest(){
+        Log.i("ALMALM" , "SOMETEST");
     }
 
 }
