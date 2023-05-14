@@ -1,18 +1,26 @@
 package com.example.smartnotifyer;
 
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AnticipateInterpolator;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        splashAnimation();
 
         context = getApplicationContext();
         tool = new ConvertStats(context);
@@ -88,17 +97,16 @@ public class MainActivity extends AppCompatActivity {
 
         UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
         List<UsageStats> usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime);
+        stats.clear();
 
         tool.setStats(usageStatsList, stats, startTime);
         setStatRecycler(stats);
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
         //Set alarm, close app and expect wake up in 1 minute
         alarmHelper = new AlarmHelper();
         alarmHelper.setAlarmInNextMinute(this);
-        Toast.makeText(this, "Wake Up In Background", Toast.LENGTH_SHORT).show();
-//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        Toast.makeText(this, "Wake Up In Background", Toast.LENGTH_SHORT).show();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     private void setStatRecycler(List<Stat> statList) {
@@ -110,6 +118,29 @@ public class MainActivity extends AppCompatActivity {
         statAdapter = new StatAdapter(this, statList);
         statRecycler.setAdapter(statAdapter);
     }
+    private void splashAnimation(){
+        getSplashScreen().setOnExitAnimationListener(splashScreenView -> {
+            splashScreenView.setBackgroundColor(Color.BLACK);
+            final ObjectAnimator slideUp = ObjectAnimator.ofFloat(
+                    splashScreenView,
+                    View.TRANSLATION_Y,
+                    0f,
+                    -splashScreenView.getHeight()
+            );
+            slideUp.setInterpolator(new AnticipateInterpolator());
+            slideUp.setDuration(600L);
 
+            // Call SplashScreenView.remove at the end of your custom animation.
+            slideUp.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    splashScreenView.remove();
+                }
+            });
+
+            // Run your animation.
+            slideUp.start();
+        });
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

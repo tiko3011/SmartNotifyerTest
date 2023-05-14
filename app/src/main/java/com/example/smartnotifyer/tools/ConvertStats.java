@@ -17,8 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConvertStats {
-    String[] arrNames = {"youtube", "viber", "beeline", "instagram", "gallery3d", "ecommerence", "music", "smartnotifyer", "launcher", "sbrowser", "forest", "popupcalculator", "settings", "snapchat", "telegram", "pinterest", "musically", "maps", "bazarblot", "roommvvm", "alarmik"};
-    String[] arrNamesChanged = {"Youtube", "Viber", "My Team", "Instagram", "Gallery", "E Commerence", "Music", "Smart Notifyer", "One UI Home", "Samsung Browser", "Forest", "Calculator", "Settings", "Snapchat", "Telegram", "Pinterest", "TikTok", "Map", "Blot",  "MVVM Example", "Alarmik"};
+    String[] arrNames = {"youtube", "viber", "beeline", "instagram", "gallery3d", "ecommerence", "music", "smartnotifyer", "launcher", "sbrowser", "forest", "popupcalculator", "settings", "snapchat", "telegram", "pinterest", "musically", "maps", "bazarblot", "roommvvm", "alarmik", "taxi", "gm", "goaltracker", "contacts", "documents", "OVFEditor"};
+    String[] arrNamesChanged = {"Youtube", "Viber", "My Team", "Instagram", "Gallery", "E Commerence", "Music", "Smart Notifyer", "One UI Home", "Samsung Browser", "Forest", "Calculator", "Settings", "Snapchat", "Telegram", "Pinterest", "TikTok", "Map", "Blot",  "MVVM Example", "Alarmik", "Yandex Go", "App", "Goal Tracker", "Contacts", "Documents", "OVF Editor"};
 
     Context context;
     public ConvertStats(Context context){
@@ -136,7 +136,7 @@ public class ConvertStats {
 
                         appName = changePackageName(packageName);
                         String totalTimeUsed = convertMiliToString(usageStats.getTotalTimeInForeground());
-                        icon = context.getResources().getDrawable(R.mipmap.ic_launcher);
+                        icon = context.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
 
                         myStat.add(new Stat(appName, totalTimeUsed, icon));
                         checkDuplicates(myStat);
@@ -148,9 +148,4 @@ public class ConvertStats {
         }
 
     }
-
-    public void someTest(){
-        Log.i("ALMALM" , "SOMETEST");
-    }
-
 }
