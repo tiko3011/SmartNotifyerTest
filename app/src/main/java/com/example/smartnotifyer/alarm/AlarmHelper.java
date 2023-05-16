@@ -21,7 +21,7 @@ public class AlarmHelper {
 
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
             //Setting alarm in 5 seconds
-            long msToOff = System.currentTimeMillis() + 60000;
+            long msToOff = System.currentTimeMillis() + 1000;
             alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(msToOff, null), alarmIntent);;
         }
     }
