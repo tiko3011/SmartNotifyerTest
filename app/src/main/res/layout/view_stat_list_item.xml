@@ -17,27 +17,27 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/aside_bgcolor">
+            android:background="@color/aside_color">
 
             <TextView
-                android:id="@+id/item_tv_UsageStat_name"
+                android:id="@+id/item_stat_name_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="5dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:padding="5dp"
                 android:text="@string/hardcoded"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/item_iv_UsageStat_icon"
+                app:layout_constraintStart_toEndOf="@+id/item_stat_delete"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/item_tv_UsageStat_time"
+                android:id="@+id/item_stat_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
+                android:layout_marginEnd="12dp"
                 android:fontFamily="@font/montserrat"
                 android:padding="5dp"
                 android:text="@string/hardcoded"
@@ -48,13 +48,14 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/item_iv_UsageStat_icon"
+                android:id="@+id/item_stat_delete"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:contentDescription="@string/hardcoded"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@android:drawable/sym_def_app_icon" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
