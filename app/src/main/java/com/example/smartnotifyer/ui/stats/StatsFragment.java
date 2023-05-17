@@ -1,4 +1,4 @@
-package com.example.smartnotifyer.ui;
+package com.example.smartnotifyer.ui.stats;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.smartnotifyer.R;
 import com.example.smartnotifyer.database.Stat;
 import com.example.smartnotifyer.mvvm.StatsViewModel;
+import com.example.smartnotifyer.ui.UsageConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +33,6 @@ public class StatsFragment extends Fragment {
 
     private StatAdapter statAdapter;
     private StatsViewModel statsViewModel;
-
-    ActivityResultLauncher<Intent> infoLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-
-            });
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -54,11 +49,12 @@ public class StatsFragment extends Fragment {
         });
 
         statsViewModel.addStatSFromSystem(start, end);
+        TextView tv = root.findViewById(R.id.tv_interval);
         SeekBar bar = root.findViewById(R.id.bar_set_interval);
         bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+                tv.setText(String.valueOf(progress));
             }
 
             @Override
