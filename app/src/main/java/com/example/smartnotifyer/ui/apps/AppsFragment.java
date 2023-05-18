@@ -7,10 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +25,7 @@ import com.example.smartnotifyer.mvvm.AppsViewModel;
 import com.example.smartnotifyer.mvvm.StatsViewModel;
 import com.example.smartnotifyer.ui.UsageConverter;
 import com.example.smartnotifyer.ui.stats.StatsFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +48,16 @@ public class AppsFragment extends Fragment {
 
         appsViewModel.getApps().observe(getViewLifecycleOwner(), apps -> {
             appAdapter.setAppList(apps);
+        });
+
+        Button btnNext = root.findViewById(R.id.btn_next);
+        btnNext.setOnClickListener(view -> {
+            StatsFragment statsFragment = new StatsFragment();
+            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.fragment_apps_list, statsFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         });
 
         return root;
